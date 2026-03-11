@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import StarRating from "../StarRating";
 import Loader from "./Loader";
+import { useKey } from "../custom-hooks/useKey";
 
 
 
@@ -9,6 +10,14 @@ export default function MovieDetails({selectedId, onCloseMovie, onAddWatched , w
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating ] = useState(false)
+
+
+  const countRef = useRef(0)
+
+  useEffect(()=>{
+    if (userRating)
+    countRef.current =  countRef.current + 1
+  },[userRating])
 
   const KEY='3eefbb5'
 
@@ -30,6 +39,12 @@ export default function MovieDetails({selectedId, onCloseMovie, onAddWatched , w
     Director: director,
   } = movie
 
+
+  /* eslint-disable */
+  //if( imdbRating > 8) [istop, setIsTop] = useState(true)
+
+
+
   function handleAdd(){
     const newWatchedMovie = {
       imdbID: selectedId,
@@ -38,7 +53,8 @@ export default function MovieDetails({selectedId, onCloseMovie, onAddWatched , w
       poster,
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
-      userRating
+      userRating,
+      countRatingNumbers: countRef.current
     };
 
    // console.log(newWatchedMovie)
@@ -52,22 +68,7 @@ export default function MovieDetails({selectedId, onCloseMovie, onAddWatched , w
   }
 
 
-useEffect(function(){
-
-  function callback(e){
-    if(e.code === "Escape"){
-      onCloseMovie()
-     // console.log("CLOSING")
-     // console.log("Closing")
-    }
-  }
-
-  document.addEventListener('keydown', callback)
-
-  return function(){
-    document.removeEventListener('keydown', callback)
-  }
-},[onCloseMovie])
+useKey( "Escape", onCloseMovie )
 
 
 
